@@ -61,6 +61,7 @@ router.post('/login',
   ));
 
 router.get('/logout', function(req,res){
+  req.logout();
   res.redirect('/auth/login')
 });
 
