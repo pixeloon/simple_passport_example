@@ -4,4 +4,6 @@ head
   meta(charset="UTF-8")
   title Document
 body
+  if(currentUser)
+    a(href="/auth/logout") Logout
   block content

@@ -4,28 +4,30 @@ const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const knex = require("../db/knex")
 const bcrypt = require("bcrypt")
+const helpers = require("../helpers/authHelpers")
+
 // Mixing too many things...good opportunity to refactor and make more modular
 passport.use(new LocalStrategy({
   usernameField: 'user[username]',
   passwordField: 'user[password]',
   passReqToCallback: true
-}, function pleaseRunMeWhenPassportAuthenticateIsCalled(req,username, password, done){
+}, function (req,username, password, done){
   // SERVER IS HANGING
   // if i do first i get undefined or {}
   // if i do NOT do first i get [] or [{}]
   knex('users').where("username", username).first().then(user => {
     if(!user){
       // SEND A FLASH MESSAGE SAYING INVALID USERNAME
-      return done(null,false)
+      return done(null,false, {message: "Invalid credentials"})
     }
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if(!isMatch){
         // SEND A FLASH MESSAGE SAYING INVALID PASSWORD
-        return done(null,false)
+        return done(null,false, {message: "Invalid credentials"})
       }
       else {
         // SEND A FLASH MESSAGE SAYING SUCCESSFULLY LOGGED IN!
-        return done(null,user)
+        return done(null,user, {message: "Welcome back!"})
       }
     })
   }).catch(err => {
@@ -48,8 +50,9 @@ passport.deserializeUser((id,done) => {
   })
 })
 
-router.get('/login', function(req,res){
-  res.render("auth/login")
+router.get('/login', helpers.preventLoginSignup, function(req,res){
+  // res.locals.name = "Elie"
+  res.render("auth/login", {message: req.flash('error')})
 });
 
 router.post('/login',
@@ -57,12 +60,18 @@ router.post('/login',
     {
       successRedirect: '/users',
       failureRedirect: '/auth/login',
+      failureFlash: true,
+      successFlash: true,
     }
   ));
 
 router.get('/logout', function(req,res){
+  req.logout();
   res.redirect('/auth/login')
 });
 
 
 module.exports = router;
+
+
+
