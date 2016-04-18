@@ -1,0 +1,8 @@
+extends ../layout
+
+block content
+  h1 Add a new User:
+  form(action="/users" method="POST")
+    input(type="text" name="user[username")
+    input(type="password" name="user[password")
+    input(type="submit" value="SIGNUP")
