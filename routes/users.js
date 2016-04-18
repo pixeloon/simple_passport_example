@@ -3,19 +3,21 @@ const router = express.Router()
 const bcrypt = require("bcrypt");
 const SALT_WORK_FACTOR = 10;
 const knex = require("../db/knex")
+const helpers = require("../helpers/authHelpers")
 
 // GET /users INDEX
-router.get('/', function(req,res){
-  res.render("users/index");
+router.get('/', helpers.ensureAuthenticated, function(req,res){
+  res.render("users/index", {message: req.flash('success')});
 });
 
 // GET /users/new NEW
-router.get('/new', function(req,res){
+router.get('/new', helpers.preventLoginSignup, function(req,res){
   res.render("users/new");
 });
 
 // POST /users CREATE
 router.post('/', function(req,res){
+  // TODO - move some of this to a helper method
   bcrypt.hash(req.body.user.password, SALT_WORK_FACTOR, (err,hash) => {
     knex('users').insert({
       username: req.body.user.username,

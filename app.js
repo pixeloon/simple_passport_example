@@ -9,6 +9,7 @@ const morgan = require("morgan");
 const flash = require("connect-flash")
 const routes = require("./routes/index")
 const passport = require("passport")
+const helpers = require("./helpers/authHelpers")
 
 app.set("view engine", "jade");
 
@@ -23,6 +24,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())
+
+app.use(helpers.currentUser)
 
 
 app.get('/', function(req,res){
