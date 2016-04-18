@@ -1,0 +1,10 @@
+extends ../layout
+
+block content
+  span Don't have an account? Sign up &nbsp;
+    a(href="/users/new") here
+  h1 Login a user:
+  form(action="/auth/login" method="POST")
+    input(type="text", name="user[username]")
+    input(type="password", name="user[password]")
+    input(type="submit", value="LOGIN")

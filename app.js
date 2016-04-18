@@ -8,16 +8,22 @@ const session = require("cookie-session");
 const morgan = require("morgan");
 const flash = require("connect-flash")
 const routes = require("./routes/index")
+const passport = require("passport")
+
 app.set("view engine", "jade");
 
 app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.urlencoded({extended: true})) // user[username] works!
 app.use(methodOverride('_method')) //?_method=WHATEVER
+app.use(morgan('dev'))
 app.use(session({
   secret: process.env.SECRET
 }))
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash())
+
 
 app.get('/', function(req,res){
   res.redirect('/auth/login');
